@@ -1,12 +1,21 @@
-import sys
-if len(sys.argv)<2:
-    print("Usage: user_word_count <config_file>")
+import optparse
+parser = optparse.OptionParser()
+
+parser.add_option("-u", action="store", type="string", dest="u")
+parser.set_defaults(u="twitter")
+opts, args = parser.parse_args()
+
+if len(args)<1:
+    print("Usage: user_word_count <config_file> [options]")
     raise SystemExit(1)
 
 import twitter
 import yaml
 
-config = yaml.safe_load(open(sys.argv[1],'r'))
+username = opts.u
+configfile = args[0]
+
+config = yaml.safe_load(open(configfile,'r'))
 
 auth = twitter.oauth.OAuth(config['oauth_token'], \
                            config['oauth_token_secret'], \
@@ -15,7 +24,7 @@ auth = twitter.oauth.OAuth(config['oauth_token'], \
 
 twitter_api = twitter.Twitter(auth=auth)
 
-kw = { 'count': 200, 'since_id':1, 'screen_name':config['screen_name']}
+kw = { 'count': 200, 'since_id':1, 'screen_name':username}
 #Obtain (max_page-1) pages of 200 results each
 results = []
 page_num = 1
